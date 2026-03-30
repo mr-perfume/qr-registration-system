@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-const socket = io("https://qr-registration-system.onrender.com/");
+const socket = io("https://qr-registration-system.onrender.com");
 
 function App() {
   const [formData, setFormData] = useState({
@@ -74,7 +74,7 @@ function App() {
 
     try {
       const res = await axios.post(
-        "https://qr-registration-system.onrender.com/",
+        "https://qr-registration-system.onrender.com/register",
         finalData
       );
 
