@@ -83,15 +83,13 @@ const app = express();
 const server = http.createServer(app);
 
 // ✅ Middleware
-app.use(cors({
-  origin: "https://qr-registration-system.vercel.app",
-}));
+app.use(cors());
 app.use(express.json());
 
 // ✅ Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "https://qr-registration-system.vercel.app",
+    origin: "*",
   },
 });
 
