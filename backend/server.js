@@ -13,7 +13,7 @@ const server = http.createServer(app);
 // 👇 Socket.io setup
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "https://qr-registration-system.vercel.app/",
   },
 });
 
@@ -21,7 +21,7 @@ const io = new Server(server, {
 // app.use(cors());
 
 app.use(cors({
-  origin: "*", // (later restrict to Vercel URL)
+  origin: "https://qr-registration-system.vercel.app/", // (later restrict to Vercel URL)
 }));
 
 app.use(express.json());
