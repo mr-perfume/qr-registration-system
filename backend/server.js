@@ -223,13 +223,17 @@ app.put("/patient/:id", async (req, res) => {
   try {
     const updated = await Patient.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      {
+        vitals: req.body.vitals,
+        symptoms: req.body.symptoms,
+      },
       { new: true }
     );
 
+    console.log("UPDATED:", updated);
+
     res.json(updated);
 
-    // 🔥 optional: emit update event
     io.emit("patient_updated", updated);
   } catch (error) {
     console.log(error);

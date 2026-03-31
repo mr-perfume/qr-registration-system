@@ -5,6 +5,21 @@ const patientSchema = new mongoose.Schema({
   age: Number,
   mobile: String,
   gender: String,
+
+  vitals: {
+    spo2: String,
+    bp: String,
+    weight: String,
+    temperature: String,
+  },
+
+  symptoms: String,
+
+  status: {
+    type: String,
+    default: "waiting",
+  },
+
   createdAt: {
     type: Date,
     default: Date.now,
