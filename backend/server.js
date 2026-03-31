@@ -136,13 +136,13 @@ app.post("/register", async (req, res) => {
     }
 
 
-// verify mobile no. is correct or not
-    const indiaMobileRegex = /^[6-9]\d{9}$/;
-    if (!indiaMobileRegex.test(mobile)) {
-      return res.status(400).json({ 
-        error: "Invalid Indian mobile number." 
-      });
-    }
+// // verify mobile no. is correct or not
+//     const indiaMobileRegex = /^[6-9]\d{9}$/;
+//     if (!indiaMobileRegex.test(mobile)) {
+//       return res.status(400).json({ 
+//         error: "Invalid Indian mobile number." 
+//       });
+//     }
 
     const newPatient = new Patient({
       name,
