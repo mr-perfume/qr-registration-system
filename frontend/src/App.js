@@ -64,6 +64,13 @@ function App() {
       return;
     }
 
+    // 2. Check if it starts with 6, 7, 8, or 9 (Indian standard)
+    const firstDigit = formData.mobile.charAt(0);
+    if (!["6", "7", "8", "9"].includes(firstDigit)) {
+      alert("Invalid number! 🇮🇳");
+      return;
+    }
+
     // ✅ combine mobile
     const finalData = {
       ...formData,

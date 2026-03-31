@@ -89,7 +89,7 @@ app.use(express.json());
 // ✅ Socket.io
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "*", //origin: "*" means it will accept connections from any website (useful for development).
   },
 });
 
@@ -133,6 +133,15 @@ app.post("/register", async (req, res) => {
 
     if (!name || !age || !mobile || !gender) {
       return res.status(400).json({ error: "Missing fields" });
+    }
+
+
+// verify mobile no. is correct or not
+    const indiaMobileRegex = /^[6-9]\d{9}$/;
+    if (!indiaMobileRegex.test(mobile)) {
+      return res.status(400).json({ 
+        error: "Invalid Indian mobile number." 
+      });
     }
 
     const newPatient = new Patient({
