@@ -226,70 +226,56 @@ app.put("/patient/:id", async (req, res) => {
       {
         vitals: req.body.vitals,
         symptoms: req.body.symptoms,
+        status: "completed",
       },
       { new: true }
     );
 
     console.log("UPDATED:", updated);
 
-    res.json(updated);
-
     io.emit("patient_updated", updated);
+
+    res.json(updated);
   } catch (error) {
     console.log(error);
     res.status(500).json({ error: "Error updating patient" });
   }
 });
 
-// ✅ POST register (QR form)
-// app.post("/register", async (req, res) => {
-//   try {
-//     if (mongoose.connection.readyState !== 1) {
-//       return res.status(500).json({ error: "DB not connected" });
-//     }
+app.post("/patient", async (req, res) => {
+  try {
+    let { name, age, mobile, gender, vitals, symptoms } = req.body;
 
-//     let { name, age, mobile, gender } = req.body;
+    mobile = mobile.replace("+91", "");
+    const fullMobile = "+91" + mobile;
 
-//     // 🔥 Clean mobile (remove +91 if present)
-//     mobile = mobile.replace("+91", "");
+    const existing = await Patient.findOne({ mobile: fullMobile });
 
-//     // ✅ Validation
-//     const indiaMobileRegex = /^[6-9]\d{9}$/;
+    if (existing) {
+      return res.status(400).json({
+        error: "Patient already exists ❌",
+      });
+    }
 
-//     if (!indiaMobileRegex.test(mobile)) {
-//       return res.status(400).json({
-//         error: "Invalid Indian mobile number.",
-//       });
-//     }
+    const newPatient = new Patient({
+      name,
+      age,
+      mobile: fullMobile,
+      gender,
+      vitals,
+      symptoms,
+      status: "completed", // 🔥 directly completed
+    });
 
-//     if (!name || !age || !mobile || !gender) {
-//       return res.status(400).json({ error: "Missing fields" });
-//     }
+    await newPatient.save();
 
-//     const newPatient = new Patient({
-//       name,
-//       age: Number(age),
-//       mobile: "+91" + mobile, // store with +91
-//       gender,
-//       status: "waiting",
-//     });
+    res.json(newPatient);
 
-//     await newPatient.save();
-
-//     console.log("Saved to DB:", newPatient);
-
-//     // 🔥 Real-time emit
-//     io.emit("new_patient", newPatient);
-
-//     res.json({
-//       message: "Patient registered & saved ✅",
-//       data: newPatient,
-//     });
-//   } catch (error) {
-//     console.log("ERROR:", error);
-//     res.status(500).json({ error: error.message });
-//   }
-// }); 
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ error: "Error adding patient" });
+  }
+});
 
 app.post("/register", async (req, res) => {
   try {
