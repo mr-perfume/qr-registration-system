@@ -13,6 +13,8 @@ function App() {
     countryCode: "+91",
   });
 
+  const [error, setError] = useState("");
+
   // 🔥 SOCKET LISTENER
   useEffect(() => {
     socket.on("new_patient", (data) => {
@@ -85,6 +87,11 @@ function App() {
         finalData
       );
 
+      setError(""); // clear error
+
+      console.log(res.data);
+      alert("Patient Registered ✅");
+
       console.log(res.data);
       alert("Patient Registered ✅");
 
@@ -96,14 +103,24 @@ function App() {
         countryCode: "+91",
       });
     } catch (err) {
-      console.error(err);
-      alert("Error ❌");
-    }
+  console.error(err);
+
+  const message =
+    err.response?.data?.error || "Something went wrong ❌";
+
+  setError(message);
+}
   };
 
   return (
     <div style={{ padding: "20px" }}>
       <h2>Patient Registration</h2>
+
+      {error && (
+      <p style={{ color: "red", fontWeight: "bold" }}>
+      {error}
+      </p>
+      )}
 
       <form onSubmit={handleSubmit}>
         <input
