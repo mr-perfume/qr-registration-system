@@ -242,6 +242,55 @@ app.put("/patient/:id", async (req, res) => {
 });
 
 // ✅ POST register (QR form)
+// app.post("/register", async (req, res) => {
+//   try {
+//     if (mongoose.connection.readyState !== 1) {
+//       return res.status(500).json({ error: "DB not connected" });
+//     }
+
+//     let { name, age, mobile, gender } = req.body;
+
+//     // 🔥 Clean mobile (remove +91 if present)
+//     mobile = mobile.replace("+91", "");
+
+//     // ✅ Validation
+//     const indiaMobileRegex = /^[6-9]\d{9}$/;
+
+//     if (!indiaMobileRegex.test(mobile)) {
+//       return res.status(400).json({
+//         error: "Invalid Indian mobile number.",
+//       });
+//     }
+
+//     if (!name || !age || !mobile || !gender) {
+//       return res.status(400).json({ error: "Missing fields" });
+//     }
+
+//     const newPatient = new Patient({
+//       name,
+//       age: Number(age),
+//       mobile: "+91" + mobile, // store with +91
+//       gender,
+//       status: "waiting",
+//     });
+
+//     await newPatient.save();
+
+//     console.log("Saved to DB:", newPatient);
+
+//     // 🔥 Real-time emit
+//     io.emit("new_patient", newPatient);
+
+//     res.json({
+//       message: "Patient registered & saved ✅",
+//       data: newPatient,
+//     });
+//   } catch (error) {
+//     console.log("ERROR:", error);
+//     res.status(500).json({ error: error.message });
+//   }
+// }); 
+
 app.post("/register", async (req, res) => {
   try {
     if (mongoose.connection.readyState !== 1) {
@@ -250,10 +299,9 @@ app.post("/register", async (req, res) => {
 
     let { name, age, mobile, gender } = req.body;
 
-    // 🔥 Clean mobile (remove +91 if present)
+    // 🔥 Clean mobile
     mobile = mobile.replace("+91", "");
 
-    // ✅ Validation
     const indiaMobileRegex = /^[6-9]\d{9}$/;
 
     if (!indiaMobileRegex.test(mobile)) {
@@ -266,10 +314,21 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ error: "Missing fields" });
     }
 
+    const fullMobile = "+91" + mobile;
+
+    // 🔥 CHECK DUPLICATE
+    const existingPatient = await Patient.findOne({ mobile: fullMobile });
+
+    if (existingPatient) {
+      return res.status(400).json({
+        error: "Patient already registered ❌",
+      });
+    }
+
     const newPatient = new Patient({
       name,
       age: Number(age),
-      mobile: "+91" + mobile, // store with +91
+      mobile: fullMobile,
       gender,
       status: "waiting",
     });
@@ -285,8 +344,17 @@ app.post("/register", async (req, res) => {
       message: "Patient registered & saved ✅",
       data: newPatient,
     });
+
   } catch (error) {
     console.log("ERROR:", error);
+
+    // 🔥 HANDLE UNIQUE INDEX ERROR (extra safety)
+    if (error.code === 11000) {
+      return res.status(400).json({
+        error: "Patient already registered ❌",
+      });
+    }
+
     res.status(500).json({ error: error.message });
   }
 });

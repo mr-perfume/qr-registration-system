@@ -3,7 +3,12 @@ const mongoose = require("mongoose");
 const patientSchema = new mongoose.Schema({
   name: String,
   age: Number,
-  mobile: String,
+  mobile: {
+  type: String,
+  required: true,
+  unique: true,   // 🔥 
+  },
+  
   gender: String,
 
   vitals: {
